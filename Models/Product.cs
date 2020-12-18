@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
 {
@@ -10,6 +12,9 @@ namespace Models
 
         [StringLength(200)]
         public string Name { get; set; }
+
+        [NotMapped]
+        public virtual ICollection<ProductCategory> ProductCategories { get; set; }
 
         [StringLength(200)]
         public string ProductLine { get; set; }
@@ -31,5 +36,10 @@ namespace Models
 
         [StringLength(200)]
         public string PictureName_big { get; set; }
+
+        public Product()
+        {
+            ProductCategories = new List<ProductCategory>();
+        }
     }
 }
