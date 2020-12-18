@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text;
 
 namespace Models
@@ -23,6 +24,30 @@ namespace Models
         public ItemsCount_SortType()
         {
             Products = new List<Product>();
+        }
+
+        public override string ToString()
+        {
+            return Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ItemsCount_SortType)
+            {
+                ItemsCount_SortType other = obj as ItemsCount_SortType;
+                return this.Id == other.Id &&
+                    this.ItemsCountMin == other.ItemsCountMin &&
+                    this.ItemsCountMax == other.ItemsCountMax &&
+                    this.Products.All(other.Products.Contains) &&
+                    this.Products.Count == other.Products.Count;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
         }
     }
 }

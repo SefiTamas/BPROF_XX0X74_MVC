@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Models
 {
@@ -60,6 +61,43 @@ namespace Models
         public Product()
         {
             ProductCategories = new List<ProductCategory>();
+        }
+
+        public override string ToString()
+        {
+            return Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Product)
+            {
+                Product other = obj as Product;
+                return this.Id == other.Id &&
+                    this.Name == other.Name &&
+                    this.ProductLine == other.ProductLine &&
+                    this.ProductCategories.All(other.ProductCategories.Contains) &&
+                    this.Age_SortTypeId == other.Age_SortTypeId &&
+                    this.Age_SortType == other.Age_SortType &&
+                    this.ItemsCount == other.ItemsCount &&
+                    this.ItemsCount_SortTypeId == other.ItemsCount_SortTypeId &&
+                    this.ItemsCount_SortType == other.ItemsCount_SortType &&
+                    this.FiguresCount == other.FiguresCount &&
+                    this.FiguresCount_SortTypeId == other.FiguresCount_SortTypeId &&
+                    this.FiguresCount_SortType == other.FiguresCount_SortType &&
+                    this.Description == other.Description &&
+                    this.Price == other.Price &&
+                    this.Price_SortTypeId == other.Price_SortTypeId &&
+                    this.Price_SortType == other.Price_SortType &&
+                    this.PictureName_thumbnail == other.PictureName_thumbnail &&
+                    this.PictureName_big == other.PictureName_big;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return 0;
         }
     }
 }
