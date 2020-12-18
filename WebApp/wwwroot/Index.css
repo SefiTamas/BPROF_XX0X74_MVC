@@ -1,0 +1,188 @@
+﻿/*body {
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}*/
+
+
+.products-container{
+    width: 75%;
+    float: right;
+    padding-top: 10%;
+    padding-right: 10%;
+    /*background-color: blue;*/
+}
+
+.col-sort{
+    width: 25%;
+    float: left;
+    /*padding-top: 10%;
+    padding-left: 10%;*/
+    /*background-color: green;*/
+}
+
+@media screen and (max-width: 1400px){
+    .products-container{
+        width: 65%;
+    }
+    .col-sort{
+        width: 35%;
+    }
+}
+
+.col-sort p{
+    width: 100%;
+    font-size: 25px;
+    text-align:center;    
+    padding-top: 8px;   
+}
+
+.refresh-a{
+    font-size: 30px;
+    text-decoration: none;     
+    float: right;    
+}
+
+.refresh-a:hover{
+    color: red;
+}
+
+#masterform {
+    display: none;
+}
+
+.slot-sort fieldset{
+    padding-top:10px;    
+}
+
+.slot-sort input{
+    width: 90px;
+}
+
+.m-sort {
+    text-decoration: none;
+    background-color: black;
+    color: white;
+    font-size: 10px;
+    float: right; 
+    margin-right: 10px;
+    padding: 2px 3px;    
+}
+
+.sort-form-section {
+    width: 100%;   
+}
+
+.sort-form-section form{
+    width: 100%;
+    padding-top: 10px;
+    padding-left: 30%;
+}
+
+.sort-submit {
+   width: 100px;
+   height: 36px;   
+}
+
+.col-left {
+    width: 30%;
+    float: left;
+}
+
+.col-left ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    width: 100%;
+ }
+
+.col-left ul li {
+    float: center;
+}
+
+.col-left ul li img, .col-left ul li h4 {
+    display: block;
+}
+
+.col-left ul li img {
+    margin: auto;
+   padding: auto;
+}
+
+.col-left ul li h4 {
+    font-size: 18px;
+    text-align: center;
+}
+
+.col-right {
+    width: 70%;
+    float: right;
+}
+
+.col-right ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+.col-right ul li {
+    width: 100%;
+}
+
+.col-right ul li a {
+    display: block;
+    text-decoration: none;
+    text-align: center-left;
+    font-size: 20px;
+    color: black;
+    margin-bottom: 18px;
+    font-weight: bold;
+}
+
+.col-right ul li a:hover{
+    color: red;
+}
+
+.col-right ul ol {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    height: 10vh;
+}
+
+.col-list-left {
+    width: 50%;
+    float: left;
+}
+
+.col-list-right {
+    width: 50%;
+    float: right;
+}
+
+.col-right ul ol h4 {
+    display: block;
+    font-size: 14px;
+    padding: 0;
+    margin-bottom: 14px;
+    font-weight: normal;
+}
+
+.col-right ul p {
+    display: block;
+    padding: 0;
+    margin: 0;
+}
+
+.product-item hr {
+    width: 100%;
+    opacity: 0.25;
+}

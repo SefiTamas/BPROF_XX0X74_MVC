@@ -1,0 +1,356 @@
+﻿@using WebApp.Models
+@model Index_input
+<div class="container">
+    <div class="col-sort">
+        @if (Model != null)
+        {
+            <p class="sz">Szűrő</p>
+            <a class="refresh-a" href="/Home/Refresh">⟳</a><br /><br /><br />
+            <form method="post" id="masterform"></form>
+        }
+        <div class="slot-sort">
+            @if (Model != null)
+            {
+                <fieldset>
+                    <legend>Termékvonal</legend>
+                    @foreach (var item in Model.ProductLines)
+                    {
+                        <input name="productLines" type="checkbox" value="@item" />
+                        <label>  @item</label>
+                        <br />
+                    }
+                </fieldset>
+            }
+        </div>
+        <div class="slot-sort">
+            @if (Model != null)
+            {
+                <fieldset>
+                    <legend>Ár</legend>
+                    @foreach (var item in Model.Price_SortTypes)
+                    {
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <input name="price_sorttypeids" type="checkbox" value="@item.Id" />
+                            if (item.PriceMin == null)
+                            {
+                                <label>@item.PriceMax Ft alatt</label>
+                            }
+                            else if (item.PriceMax == null)
+                            {
+                                <label>@item.PriceMin Ft fölött</label>
+                            }
+                            else
+                            {
+                                <label>@item.PriceMin Ft - @item.PriceMax Ft</label>
+                            }
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            if (item.PriceMin == null)
+                            {
+                                <label><input id="@item.Id" type="number" name="pricemin" value="0" /> Ft - <input type="number" name="pricemax" value="@item.PriceMax" /> Ft</label>
+                            }
+                            else if (item.PriceMax == null)
+                            {
+                                <label><input id="@item.Id" type="number" name="pricemin" value="@item.PriceMin" /> Ft - <input type="number" name="pricemax" value=0 /> Ft</label>
+                            }
+                            else
+                            {
+                                <label><input id="@item.Id" type="number" name="pricemin" value="@item.PriceMin" /> Ft - <input type="number" name="pricemax" value="@item.PriceMax" /> Ft</label>
+                            }
+                        }
+                        <a href="/Home/DeletePriceSort?id=@item.Id" style="margin-right:0;" class="m-sort">Törlés</a>
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <a href="/Home/Refresh?id=@item.Id" class="m-sort">Módosítás</a>
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                            <a style="margin-right:5px;" href="#" onclick="SavePriceSort()" class="m-sort">Mentés</a>
+                        }
+                        <br />
+                    }
+                    @if (ViewBag.AddSort != "price")
+                    {
+                        <a href="/Home/Refresh?newsort=price" style="margin-right:0;" class="m-sort">+</a>
+                    }
+                    else
+                    {
+                        <label><input type="number" name="pricemin" value="0" /> Ft - <input type="number" name="pricemax" value="0" /> Ft</label>
+                        <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                        <a style="margin-right:5px;" href="#" onclick="SavePriceSort('newprice')" class="m-sort">Mentés</a>
+                    }
+                </fieldset>
+            }
+        </div>
+        <div class="slot-sort">
+            @if (Model != null)
+            {
+                <fieldset>
+                    <legend>Életkor</legend>
+                    @foreach (var item in Model.Age_SortTypes)
+                    {
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <input name="age_sorttypeids" type="checkbox" value="@item.Id" />
+                            if (item.RecommendedAge == null)
+                            {
+                                <label>@item.RecommendedAgeMin - @item.RecommendedAgeMax</label>
+                            }
+                            else
+                            {
+                                <label>@item.RecommendedAge+</label>
+                            }
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            if (item.RecommendedAge == null)
+                            {
+                                <label><input id="@item.Id" style="width:45px;" type="number" name="age" value="0" /> | <input style="width:45px;" type="number" name="agemin" value="@item.RecommendedAgeMin" /> - <input style="width:45px;" type="number" name="agemax" value="@item.RecommendedAgeMax" /></label>
+                            }
+                            else
+                            {
+                                <label><input id="@item.Id" style="width:45px;" type="number" name="age" value="@item.RecommendedAge" /> | <input style="width:45px;" type="number" name="agemin" value="0" /> - <input style="width:45px;" type="number" name="agemax" value="0" /></label>
+                            }
+                        }
+                        <a href="/Home/DeleteAgeSort?id=@item.Id" style="margin-right:0;" class="m-sort">Törlés</a>
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <a href="/Home/Refresh?id=@item.Id" class="m-sort">Módosítás</a>
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                            <a style="margin-right:5px;" href="#" onclick="SaveAgeSort()" class="m-sort">Mentés</a>
+                        }
+                        <br />
+                    }
+                    @if (ViewBag.AddSort != "age")
+                    {
+                        <a href="/Home/Refresh?newsort=age" style="margin-right:0;" class="m-sort">+</a>
+                    }
+                    else
+                    {
+                        <label><input style="width:45px;" type="number" name="age" value="0" /> | <input style="width:45px;" type="number" name="agemin" value="0" /> - <input style="width:45px;" type="number" name="agemax" value="0" /></label>
+                        <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                        <a style="margin-right:5px;" href="#" onclick="SaveAgeSort('newage')" class="m-sort">Mentés</a>
+                    }
+                </fieldset>
+            }
+        </div>
+        <div class="slot-sort">
+            @if (Model != null)
+            {
+                <fieldset>
+                    <legend>Elemszám</legend>
+                    @foreach (var item in Model.ItemsCount_SortTypes)
+                    {
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <input name="itemsc_sorttypeids" type="checkbox" value="@item.Id" />
+                            if (item.ItemsCountMin == null)
+                            {
+                                <label>@item.ItemsCountMax db alatt</label>
+                            }
+                            else if (item.ItemsCountMax == null)
+                            {
+                                <label>@item.ItemsCountMin db fölött</label>
+                            }
+                            else
+                            {
+                                <label>@item.ItemsCountMin db - @item.ItemsCountMax db</label>
+                            }
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            if (item.ItemsCountMin == null)
+                            {
+                                <label><input id="@item.Id" type="number" name="itemscmin" value="0" /> db - <input type="number" name="itemscmax" value="@item.ItemsCountMax" /> db</label>
+                            }
+                            else if (item.ItemsCountMax == null)
+                            {
+                                <label><input id="@item.Id" type="number" name="itemscmin" value="@item.ItemsCountMin" /> db - <input type="number" name="itemscmax" value=0 /> db</label>
+                            }
+                            else
+                            {
+                                <label><input id="@item.Id" type="number" name="itemscmin" value="@item.ItemsCountMin" /> db - <input type="number" name="itemscmax" value="@item.ItemsCountMax" /> db</label>
+                            }
+                        }
+                        <a href="/Home/DeleteItemsSort?id=@item.Id" style="margin-right:0;" class="m-sort">Törlés</a>
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <a href="/Home/Refresh?id=@item.Id" class="m-sort">Módosítás</a>
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                            <a style="margin-right:5px;" href="#" onclick="SaveItemsSort()" class="m-sort">Mentés</a>
+                        }
+                        <br />
+                    }
+                    @if (ViewBag.AddSort != "itemsc")
+                    {
+                        <a href="/Home/Refresh?newsort=itemsc" style="margin-right:0;" class="m-sort">+</a>
+                    }
+                    else
+                    {
+                        <label><input type="number" name="itemscmin" value="0" /> db - <input type="number" name="itemscmax" value="0" /> db</label>
+                        <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                        <a style="margin-right:5px;" href="#" onclick="SaveItemsSort('newitemsc')" class="m-sort">Mentés</a>
+                    }
+                </fieldset>
+            }
+        </div>
+        <div class="slot-sort">
+            @if (Model != null)
+            {
+                <fieldset>
+                    <legend>Figurák száma</legend>
+                    @foreach (var item in Model.FiguresCount_SortTypes)
+                    {
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <input name="figuresc_sorttypeids" type="checkbox" value="@item.Id" />
+                            if (item.FiguresCount == null)
+                            {
+                                <label>@item.FiguresCountMin db - @item.FiguresCountMax db</label>
+                            }
+                            else
+                            {
+                                <label>@item.FiguresCount db</label>
+                            }
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            if (item.FiguresCount == null)
+                            {
+                                <label><input id="@item.Id" style="width:45px;" type="number" name="figuresc" value="0" /> db | <input style="width:45px;" type="number" name="figurescmin" value="@item.FiguresCountMin" /> db - <input style="width:45px;" type="number" name="figurescmax" value="@item.FiguresCountMax" /> db</label>
+                            }
+                            else
+                            {
+                                <label><input id="@item.Id" style="width:45px;" type="number" name="figuresc" value="@item.FiguresCount" /> db | <input style="width:45px;" type="number" name="figurescmin" value="0" /> db - <input style="width:45px;" type="number" name="figurescmax" value="0" /> db</label>
+                            }
+                        }
+                        <a href="/Home/DeleteFiguresSort?id=@item.Id" style="margin-right:0;" class="m-sort">Törlés</a>
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <a href="/Home/Refresh?id=@item.Id" class="m-sort">Módosítás</a>
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                            <a style="margin-right:5px;" href="#" onclick="SaveFiguresSort()" class="m-sort">Mentés</a>
+                        }
+
+                        <br />
+                    }
+                    @if (ViewBag.AddSort != "figuresc")
+                    {
+                        <a href="/Home/Refresh?newsort=figuresc" style="margin-right:0;" class="m-sort">+</a>
+                    }
+                    else
+                    {
+                        <label><input style="width:45px;" type="number" name="figuresc" value="0" /> db | <input style="width:45px;" type="number" name="figurescmin" value="0" /> db - <input style="width:45px;" type="number" name="figurescmax" value="0" /> db</label>
+                        <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                        <a style="margin-right:5px;" href="#" onclick="SaveFiguresSort('newfiguresc')" class="m-sort">Mentés</a>
+                    }
+                </fieldset>
+            }
+        </div>
+        <div class="slot-sort">
+            @if (Model != null)
+            {
+                <fieldset>
+                    <legend>Kategóriák</legend>
+                    @foreach (var item in Model.Categories)
+                    {
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <input name="categoryids" type="checkbox" value="@item.Id" />
+                            <label>@item.Name</label>
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            <label><input style="width:110px;" id="@item.Id" type="text" name="categ" value="@item.Name" /></label>
+                        }
+                        <a href="/Home/DeleteCategory?id=@item.Id" style="margin-right:0;" class="m-sort">Törlés</a>
+                        if (ViewBag.EditSort != item.Id || ViewBag.EditSort == null)
+                        {
+                            <a href="/Home/Refresh?id=@item.Id" class="m-sort">Módosítás</a>
+                        }
+                        else if (ViewBag.EditSort == item.Id)
+                        {
+                            <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                            <a style="margin-right:5px;" href="#" onclick="SaveCategorySort()" class="m-sort">Mentés</a>
+                        }
+                        <br />
+                    }
+                    @if (ViewBag.AddSort != "categ")
+                    {
+                        <a href="/Home/Refresh?newsort=categ" style="margin-right:0;" class="m-sort">+</a>
+                    }
+                    else
+                    {
+                        <label><input style="width:110px;" type="text" name="categ" value="" /></label>
+                        <a style="margin-right:5px;" href="/Home/Refresh" class="m-sort">Mégse</a>
+                        <a style="margin-right:5px;" href="#" onclick="SaveCategorySort('newcateg')" class="m-sort">Mentés</a>
+                    }
+                </fieldset>
+            }
+        </div>
+        @if (Model != null)
+        {
+            <div class="sort-form-section">
+                <form name="formsort" id="formsort" method="post">
+                    <input class="sort-submit" type="button" value="Szűrés" onclick="submitForm()" />
+                </form>
+            </div>
+        }
+    </div>
+    <div class="products-container">
+        @if (Model != null)
+        {
+            @foreach (var item in Model.Products)
+            {
+                <div class="product-item">
+                    <div style=width:100%;>
+                        <div class="col-left">
+                            <ul>
+                                <li><a href="/Home/Product?productid=@item.Id"><img src="~/Pictures/@item.PictureName_thumbnail" alt="Termék kép"></a></li>
+                                <li><h4>@item.Price Ft</h4></li>
+                            </ul>
+                        </div>
+                        <div class="col-right">
+                            <ul>
+                                <li><a class="productTitle" id="@item.Id" href="/Home/Product?productid=@item.Id">@item.Name</a></li>
+                                <ol class="col-list-left">
+                                    <h4>Termékvonal: @item.ProductLine</h4>
+                                    
+                                    @if (item.Age_SortType != null)
+                                    {
+                                        if (item.Age_SortType.RecommendedAge != null)
+                                        {
+                                            <h4>Ajánlott korosztály: @item.Age_SortType.RecommendedAge+</h4>
+                                        }
+                                        else
+                                        {
+                                            <h4>Ajánlott korosztáy: @item.Age_SortType.RecommendedAgeMin - @item.Age_SortType.RecommendedAgeMax</h4>
+                                        }
+                                    }
+                                </ol>
+                                <ol class="col-list-right">
+                                    <h4>Elemszám: @item.ItemsCount db</h4>
+                                    <h4>Figurák száma: @item.FiguresCount db</h4>
+                                </ol>
+                                <p>@item.Description</p>
+                            </ul>
+                        </div>
+                    </div>
+                    <hr />
+                </div>
+            }
+        }
+    </div>
+</div>

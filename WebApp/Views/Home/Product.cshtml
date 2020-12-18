@@ -1,0 +1,298 @@
+﻿@using WebApp.Models
+@model Product_input
+
+<div>
+    <div class="pr-item">
+        <div class="p-left-col">
+            <ul>
+                @if (Model.Product.PictureName_big != "" && Model.Product.PictureName_big != " " && Model.Product.PictureName_big != null)
+                {
+                    <li class="p-img-holder"><img src="~/Pictures/@Model.Product.PictureName_big" /></li>
+                }
+                else
+                {
+                    <li class="p-img-holder"><img src="http://placehold.it/250x200"/></li>
+                }
+                @if (ViewBag.ProductViewState == "Display")
+                {
+                    <li class="p-price"><p>@Model.Product.Price Ft</p></li>
+                }
+                else if (ViewBag.ProductViewState == "Change" || ViewBag.ProductViewState == "New")
+                {
+                    <li class="p-price"><p><input style="width:100px;" type="number" name="price" value="@Model.Product.Price" /> Ft</p></li>
+                }               
+            </ul>
+        </div>
+        <div class="p-col">
+            @if (ViewBag.ProductViewState == "Display")
+            {
+                <p class="p-title" id="@Model.Product.Id">@Model.Product.Name</p>
+            }
+            else if (ViewBag.ProductViewState == "New" || Model.Product.Id == "" || Model.Product.Id == null)
+            {
+                <p class="p-title">Új Termék</p>
+            }
+            else if (ViewBag.ProductViewState == "Change")
+            {
+                <p class="p-title">Termék módosítása</p>
+            }
+            <ul class="btns-ul">
+                @if (ViewBag.ProductViewState == "Display")
+                {
+                    <li><a href="/Home/Change?productid=@Model.Product.Id">Módosítás</a></li>
+                }
+                else if (ViewBag.ProductViewState == "Change" && Model.Product.Id != "" && Model.Product.Id != null)
+                {
+                    <li><a href="/Home/Product?productid=@Model.Product.Id">Mégse</a></li>
+                    <li><a onclick="savechanges()">Mentés</a></li>
+                }
+                @if (ViewBag.ProductViewState != "New" && Model.Product.Id != "" && Model.Product.Id != null)
+                {
+                    <li><a href="/Home/DeleteProduct?productid=@Model.Product.Id">Törlés</a></li>
+                }
+                @if (Model.Product.Id == "" || Model.Product.Id == null)
+                {
+                    <li><a href="/Home/Refresh">Mégse</a></li>
+                    <li><a onclick="savechanges('newpro')">Mentés</a></li>
+                }
+
+            </ul>
+            @if (ViewBag.ProductViewState == "Change" || ViewBag.ProductViewState == "New")
+            {
+                <ul class="pic-ul">
+                    <li><label>termék kép (kicsi)</label><input type="text" name="thumbnail" value="@Model.Product.PictureName_thumbnail" /></li>
+                    <li><label>termék kép (nagy)</label><input type="text" name="bigpicture" value="@Model.Product.PictureName_big" /></li>
+                </ul>
+            }
+        </div>
+        @{string tablecolheight = "", catcolheight = "", descinputtext = "";
+            if (ViewBag.ProductViewState == "Display")
+            {
+                tablecolheight = Convert.ToString(40 + 20 * @Model.CategoriesAll.Count()) + "px;";
+                catcolheight = Convert.ToString(20 * @Model.Categories.Count()) + "px;";
+            }
+            else if (ViewBag.ProductViewState == "Change" || ViewBag.ProductViewState == "New")
+            {
+                tablecolheight = Convert.ToString(20 + 20 * 4 + 20 * @Model.CategoriesAll.Count()) + "px;";
+                catcolheight = Convert.ToString(20 * @Model.SelectedCategories.Count() * 2 + 20 + 20) + "px;";
+                descinputtext = Convert.ToString(80 + (20 * @Model.SelectedCategories.Count() * 2 + 20 + 20)) + "px;";
+            }
+            string agecolheightchange = Convert.ToString(20 * 4 + 3 * 5) + "px;";
+        }
+        <div class="p-details">
+            <div class="p-left-half" style="height:@tablecolheight">
+                <ul class="half-left">
+                    <li>Termékvonal</li>
+                    @if (ViewBag.ProductViewState == "Change" || ViewBag.ProductViewState == "New")
+                    {
+                        <li style="height:@agecolheightchange">Ajánlott korosztály</li>
+                    }
+                    else if (ViewBag.ProductViewState == "Display")
+                    {
+                        <li>Ajánlott korosztály</li>
+                    }
+                    <li>Elemszám</li>
+                    <li>Figurák száma</li>
+                    <li style="height:@catcolheight">kategóriák</li>
+                </ul>
+                <ul class="half-right">
+                    @if (ViewBag.ProductViewState == "Display")
+                    {
+                        <li class="half-right-cell">@Model.Product.ProductLine</li>
+                        if (Model.Product.Age_SortType != null)
+                        {
+                            if (Model.Product.Age_SortType.RecommendedAge == null)
+                            {
+                                <li class="half-right-cell">@Model.Product.Age_SortType.RecommendedAgeMin - @Model.Product.Age_SortType.RecommendedAgeMax</li>
+                            }
+                            else
+                            {
+                                <li class="half-right-cell">@Model.Product.Age_SortType.RecommendedAge+</li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="half-right-cell"></li>
+                        }
+                        <li class="half-right-cell">@Model.Product.ItemsCount db</li>
+                        <li class="half-right-cell">@Model.Product.FiguresCount db</li>
+                        <li class="half-right-cell" style="height:@catcolheight">
+                            <ul>
+                                @foreach (var item in Model.Categories)
+                                {
+                                    <li>@item.Name</li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                    else if (ViewBag.ProductViewState == "Change" || ViewBag.ProductViewState == "New")
+                    {
+                        <li class="half-right-cell"><input class="text-input" type="text" name="productline" value="@Model.Product.ProductLine" /></li>
+                        if (Model.Product.Age_SortType != null)
+                        {
+                            if (Model.Product.Age_SortType.RecommendedAge == null || Model.Product.Age_SortType.RecommendedAge == 0)
+                            {
+                                <li class="half-right-cell" style="height:@agecolheightchange">
+                                    <ul class="change-age">
+                                        <li class="ch-li" id="li-age">
+                                            <label>Kor: </label>
+                                            <input class="num-input" type="number" name="recommendedage" value="0" />
+                                        </li>
+                                        <li class="ch-li">
+                                            <ul>
+                                                <li style="width:30%;margin:0;padding:0;display:inline-block;"><input class="radio" type="radio" id="age" value="Kor" onclick="checkedopacity('age')" /> Kor</li>
+                                                <li style="width:30%;margin:0;padding:0;display:inline-block;"> <p class="separator">VAGY</p></li>
+                                                <li style="width:30%;margin:0;padding:0;display:inline-block;"><input class="radio" type="radio" id="agerange" value="Min-Max" onclick="checkedopacity('agerange')" checked /> Min-Max</li>
+                                            </ul>
+                                        </li>
+                                        <li class="ch-li" id="li-agemin">
+                                            <label>Kor minimum: </label>
+                                            <input class="num-input" type="number" name="recommendedagemin" value="@Model.Product.Age_SortType.RecommendedAgeMin" />
+                                        </li>
+                                        <li class="ch-li" id="li-agemax">
+                                            <label>Kor maximum: </label>
+                                            <input class="num-input" type="number" name="recommendedagemax" value="@Model.Product.Age_SortType.RecommendedAgeMax" />
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="half-right-cell" style="height:@agecolheightchange">
+                                    <ul class="change-age">
+                                        <li class="ch-li" id="li-age">
+                                            <label>Kor: </label>
+                                            <input class="num-input" type="number" name="recommendedage" value="@Model.Product.Age_SortType.RecommendedAge" />
+                                        </li>
+                                        <li class="ch-li">
+                                            <ul>
+                                                <li style="width:30%;margin:0;padding:0;display:inline-block;"><input class="radio" type="radio" id="age" value="Kor" onclick="checkedopacity('age')" checked /> Kor</li>
+                                                <li style="width:30%;margin:0;padding:0;display:inline-block;"> <p class="separator">VAGY</p></li>
+                                                <li style="width:30%;margin:0;padding:0;display:inline-block;"><input class="radio" type="radio" id="agerange" value="Min-Max" onclick="checkedopacity('agerange')" /> Min-Max</li>
+                                            </ul>
+                                        </li>
+                                        <li class="ch-li" id="li-agemin">
+                                            <label>Kor minimum: </label>
+                                            <input class="num-input" type="number" name="recommendedagemin" value="0" />
+                                        </li>
+                                        <li class="ch-li" id="li-agemax">
+                                            <label>Kor maximum: </label>
+                                            <input class="num-input" type="number" name="recommendedagemax" value="0" />
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="half-right-cell" style="height:@agecolheightchange">
+                                <ul class="change-age">
+                                    <li class="ch-li" id="li-age">
+                                        <label>Kor: </label>
+                                        <input class="num-input" type="number" name="recommendedage" value="0" />
+                                    </li>
+                                    <li class="ch-li">
+                                        <ul>
+                                            <li style="width:30%;margin:0;padding:0;display:inline-block;"><input class="radio" type="radio" id="age" value="Kor" onclick="checkedopacity('age')" checked /> Kor</li>
+                                            <li style="width:30%;margin:0;padding:0;display:inline-block;"> <p class="separator">VAGY</p></li>
+                                            <li style="width:30%;margin:0;padding:0;display:inline-block;"><input class="radio" type="radio" id="agerange" value="Min-Max" onclick="checkedopacity('agerange')" /> Min-Max</li>
+                                        </ul>
+                                    </li>
+                                    <li class="ch-li" id="li-agemin">
+                                        <label>Kor minimum: </label>
+                                        <input class="num-input" type="number" name="recommendedagemin" value="0" />
+                                    </li>
+                                    <li class="ch-li" id="li-agemax">
+                                        <label>Kor maximum: </label>
+                                        <input class="num-input" type="number" name="recommendedagemax" value="0" />
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        <li class="half-right-cell">
+                            <input class="num-input" type="number" name="itemscount" value="@Model.Product.ItemsCount" />
+                            <label> db</label>
+                        </li>
+                        <li class="half-right-cell">
+                            <input class="num-input" type="number" name="figurescount" value="@Model.Product.FiguresCount" />
+                            <label> db</label>
+                        </li>
+
+                        <li class="half-right-cell" style="height:@catcolheight">
+                            <ul>
+                                @if (Model.SelectedCategories != null)
+                                {
+                                    int count = 0;
+                                    foreach (var item in Model.SelectedCategories)
+                                    {
+                                        string liid = "li" + Convert.ToString(count);
+                                        string formid = "form" + Convert.ToString(count);
+                                        <li class="c-name" style="display:inline-block;" id="@liid">
+                                            <select name="categories">
+                                                @foreach (var cat in Model.CategoriesAll)
+                                                {
+                                                    if (cat.Id != item.Id)
+                                                    {
+                                                        <option value="@cat.Name" id="@cat.Id">@cat.Name</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@cat.Name" id="@cat.Id" selected>@cat.Name</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <form style="width:70px;padding:0;margin:0;" class="categories" name="@formid" id="@formid" method="post">
+                                                <input style="width:70px;" type="button" value="Törlés ↑" onclick="removecategory(this.form)" />
+                                            </form>
+                                        </li>
+                                        count = count + 1;
+                                    }
+                                }
+                                @if (ViewBag.AddCategory == "True")
+                                {
+                                    <li class="c-name">
+                                        <select name="categories">
+                                            <option value="válasszon!" id="null">válasszon!</option>
+                                            @foreach (var item in Model.CategoriesAll)
+                                            {
+                                                <option value="@item.Name" id="@item.Id">@item.Name</option>
+                                            }
+                                        </select>
+                                    </li>
+                                }
+                                <li>
+                                    <form name="addcateg" id="addcateg" method="post">
+                                        <input type="button" value="+" onclick="addcategory()" />
+                                        @if (ViewBag.AddCategory == "True")
+                                        {
+                                            <input style="width:70px;" type="button" value="Törlés ↑" onclick="removeemptycategory()" />
+                                        }
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+
+                    }
+                </ul>
+            </div>
+            <div class="p-right-half" style="height:@tablecolheight">
+                @if (ViewBag.ProductViewState == "Display")
+                {
+                    <ul>
+                        <li class="p-model">Modell: @Model.Product.Name</li>
+                        <li class="p-desc-title">Leírás:</li>
+                        <li class="p-desc">@Model.Product.Description</li>
+                    </ul>
+                }
+                else if (ViewBag.ProductViewState == "Change" || ViewBag.ProductViewState == "New")
+                {
+                    <ul>
+                        <li class="p-model">Modell: <input style="width:90%;float:right;" type="text" name="title" value="@Model.Product.Name" /></li>
+                        <li class="p-desc-title">Leírás:</li>
+                        <li class="p-desc"><textarea style="width:100%;height:@descinputtext" name="description">@Model.Product.Description</textarea></li>
+                    </ul>
+                }               
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width initial-scale=1.0" />
+    <link href="/Layout.css?v=2" rel="stylesheet" type="text/css" asp-append-version="true" />
+    @if (ViewBag.Index == true)
+    {
+        <link href="/Index.css?v=6" rel="stylesheet" type="text/css" asp-append-version="true" />
+        <script src="~/Index.js?v=3" asp-append-version="true"></script>
+    }
+    else
+    {
+        <link href="/Product.css?v=2" rel="stylesheet" type="text/css" asp-append-version="true" />
+        <script src="~/Product.js?v=3" asp-append-version="true"></script>
+    }
+    <title></title>
+</head>
+<body>
+    <div class="navbar">
+        <a style="border-radius:0 25px 25px 0" href="/Home/Refresh">Index</a>
+        @if (Model == null)
+        {
+            <a style="margin-left:15%;" href="/Home/Init">Adatbázis feltöltése</a>
+        }
+        else
+        {
+            <a style="margin-left:15%;" href="/Home/AddProduct">Új termék hozzáadása</a>
+        }
+    </div>
+    @RenderBody()
+</body>
+</html>
