@@ -36,6 +36,11 @@ namespace Models
         [Range(0, 10000000)]
         public int Price { get; set; }
 
+        public string Price_SortTypeId { get; set; }
+
+        [NotMapped]
+        public virtual Price_SortType Price_SortType { get; set; }
+
         [StringLength(200)]
         public string PictureName_thumbnail { get; set; }
 
