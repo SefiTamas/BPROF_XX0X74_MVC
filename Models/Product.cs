@@ -27,6 +27,11 @@ namespace Models
         [Range(1, 1000000)]
         public int ItemsCount { get; set; }
 
+        public string ItemsCount_SortTypeId { get; set; }
+
+        [NotMapped]
+        public virtual ItemsCount_SortType ItemsCount_SortType { get; set; }
+
         [Range(0, 1000000)]
         public int FiguresCount { get; set; }
 
