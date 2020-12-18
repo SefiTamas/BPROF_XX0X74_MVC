@@ -35,6 +35,11 @@ namespace Models
         [Range(0, 1000000)]
         public int FiguresCount { get; set; }
 
+        public string FiguresCount_SortTypeId { get; set; }
+
+        [NotMapped]
+        public virtual FiguresCount_SortType FiguresCount_SortType { get; set; }
+
         [StringLength(500)]
         public string Description { get; set; }
 
