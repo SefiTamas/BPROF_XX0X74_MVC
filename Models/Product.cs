@@ -19,6 +19,11 @@ namespace Models
         [StringLength(200)]
         public string ProductLine { get; set; }
 
+        public string Age_SortTypeId { get; set; }
+
+        [NotMapped]
+        public virtual Age_SortType Age_SortType { get; set; }
+
         [Range(1, 1000000)]
         public int ItemsCount { get; set; }
 
