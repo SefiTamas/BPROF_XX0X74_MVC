@@ -53,9 +53,24 @@ namespace Logic
 			return productRepo.Read(Id);
 		}
 
-		public void UpdateProduct(string Id, Product newitem)
+		public void UpdateProduct(string Id, Product newitem, List<Category> categories, Age_SortType age_SortType)
 		{
+			RemoveAge_SortTypeFromProduct(Id);
+			RemovePrice_SortTypeFromProduct(Id);
+			RemoveItemsCount_SortTypeFromProduct(Id);
+			RemoveFiguresCount_SortTypeFromProduct(Id);
+			RemoveAllCategoryFromProduct(Id);
+
 			productRepo.Update(Id, newitem);
+
+			foreach (var item in categories)
+			{
+				AddCategoryToProduct(item, Id);
+			}
+
+			AddAge_SortTypeToProduct(age_SortType, Id);
+
+			Save();
 		}
 
 		public void Save()
@@ -64,7 +79,156 @@ namespace Logic
 		}
 
 
+		public List<Product> SortByProductLine(List<Product> products, List<string> productLines)
+		{
+			products = (from x in products.AsQueryable()
+						join l in productLines.AsQueryable() on x.ProductLine equals l
+						select x).ToList();
 
+			return products;
+		}
+
+		public List<Product> SortByAge(List<Product> products, List<string> age_sorttypeIds) //2 tables
+		{
+			products = (from x in products.AsQueryable()
+						join a in age_sorttypeIds.AsQueryable() on x.Age_SortTypeId equals a
+						select x).ToList();
+
+			return products;
+		}
+
+		public List<Product> SortByItemsCount(List<Product> products, List<string> itemscount_sorttypeIds) //2 tables
+		{
+			products = (from x in products.AsQueryable()
+						join i in itemscount_sorttypeIds.AsQueryable() on x.ItemsCount_SortTypeId equals i
+						select x).ToList();
+
+			return products;
+		}
+
+		public List<Product> SortByFiguresCount(List<Product> products, List<string> figurescount_sorttypeIds)
+		{
+			products = (from x in products.AsQueryable()
+						join f in figurescount_sorttypeIds.AsQueryable() on x.FiguresCount_SortTypeId equals f
+						select x).ToList();
+
+			return products;
+		}
+
+		public List<Product> SortByPrice(List<Product> products, List<string> price_sorttypeIds) //2 tables
+		{
+			products = (from x in products.AsQueryable()
+						join p in price_sorttypeIds.AsQueryable() on x.Price_SortTypeId equals p
+						select x).ToList();
+
+			return products;
+		}
+
+		public List<Product> SortByCategory(List<Product> products, List<string> categoryIds) //2 tables
+		{
+			List<Product> _products = new List<Product>();
+			foreach (var item in categoryIds)
+			{
+				var p = (from x in products.AsQueryable()
+						 where (from y in productCategRepo.Read()
+								join c in categRepo.Read() on y.CategoryId equals c.Id
+								where c.Name == categRepo.Read(item).Name
+								select y).Any(p => p.ProductId == x.Id)
+						 select x).ToList();
+				foreach (var pitem in p)
+				{
+					_products.Add(pitem);
+				}
+			}
+			return _products;
+		}
+
+		public IQueryable<string> GetAllProductLine()
+		{
+			var productLines = from x in GetAllProduct()
+							   group x by x.ProductLine into g
+							   select g.Key;
+
+			return productLines;
+		}
+
+		public Age_SortType GetProductAge_SortType(string productid)
+		{
+			Age_SortType age_SortType = (from x in ageRepo.Read()
+										 where x.Id == GetProduct(productid).Age_SortTypeId
+										 select x).FirstOrDefault();
+			return age_SortType;
+		}
+
+		public Price_SortType GetPrice_SortTypeForPrice(int price)
+		{
+			Price_SortType price_SortType = (from x in price_sortRepo.Read()
+											 where (x.PriceMin == null && x.PriceMax > price) || (x.PriceMax == null && x.PriceMin <= price) || (x.PriceMin <= price && x.PriceMax > price)
+											 select x).FirstOrDefault();
+			return price_SortType;
+		}
+
+		public void AttachProductsToPrice_SortType(string id)
+		{
+			var products = from x in GetAllProduct()
+						   where (price_sortRepo.Read(id).PriceMin == null && price_sortRepo.Read(id).PriceMax > x.Price) || (price_sortRepo.Read(id).PriceMax == null && price_sortRepo.Read(id).PriceMin <= x.Price) || (price_sortRepo.Read(id).PriceMin <= x.Price && price_sortRepo.Read(id).PriceMax > x.Price)
+						   select x;
+			foreach (var item in products)
+			{
+				item.Price_SortTypeId = id;
+			}
+			Save();
+		}
+
+		public void AttachProductsToItems_SortType(string id)
+		{
+			var products = from x in GetAllProduct()
+						   where (itemsc_sortRepo.Read(id).ItemsCountMin == null && itemsc_sortRepo.Read(id).ItemsCountMax > x.ItemsCount) || (itemsc_sortRepo.Read(id).ItemsCountMax == null && itemsc_sortRepo.Read(id).ItemsCountMin <= x.ItemsCount) || (itemsc_sortRepo.Read(id).ItemsCountMin <= x.ItemsCount && itemsc_sortRepo.Read(id).ItemsCountMax > x.ItemsCount)
+						   select x;
+			foreach (var item in products)
+			{
+				item.ItemsCount_SortTypeId = id;
+			}
+			Save();
+		}
+
+		public void AttachProductsToFigures_SortType(string id)
+		{
+			var products = from x in GetAllProduct()
+						   where figuresc_sortRepo.Read(id).FiguresCount == x.FiguresCount || (figuresc_sortRepo.Read(id).FiguresCountMin == null && figuresc_sortRepo.Read(id).FiguresCountMax >= x.FiguresCount) || (figuresc_sortRepo.Read(id).FiguresCountMax == null && figuresc_sortRepo.Read(id).FiguresCountMin <= x.FiguresCount) || (figuresc_sortRepo.Read(id).FiguresCountMin <= x.FiguresCount && figuresc_sortRepo.Read(id).FiguresCountMax >= x.FiguresCount)
+						   select x;
+			foreach (var item in products)
+			{
+				item.FiguresCount_SortTypeId = id;
+			}
+			Save();
+		}
+
+		public void AddAge_SortTypeToProduct(Age_SortType age_SortType, string productId)
+		{
+			Age_SortType a = new Age_SortType();
+			if (age_SortType.RecommendedAge == null)
+			{
+				a = (from x in ageRepo.Read()
+					 where x.RecommendedAgeMax == age_SortType.RecommendedAgeMax && x.RecommendedAgeMin == age_SortType.RecommendedAgeMin
+					 select x).FirstOrDefault();
+			}
+			else
+			{
+				a = (from x in ageRepo.Read()
+					 where x.RecommendedAge == age_SortType.RecommendedAge
+					 select x).FirstOrDefault();
+			}
+			if (a != null)
+			{
+				GetProduct(productId).Age_SortTypeId = a.Id;
+				Save();
+			}
+			else
+			{
+				AddNEWAge_SortTypeToProduct(age_SortType, productId);
+			}
+		}
 		public void AddCategoryToProduct(Category category, string productId)
 		{
 			bool IsPartOfIt = false;
