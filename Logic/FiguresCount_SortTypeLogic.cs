@@ -40,5 +40,21 @@ namespace Logic
 		{
 			figuresc_sortRepo.Update(Id, newitem);
 		}
+
+		public IQueryable<FiguresCount_SortType> OrderByFigures(IQueryable<FiguresCount_SortType> figures)
+		{
+			IQueryable<FiguresCount_SortType> figuresc_SortTypes = from x in figures
+																   orderby x.FiguresCountMin
+																   select x;
+			return figuresc_SortTypes;
+		}
+
+		public FiguresCount_SortType GetFiguresCount_SortTypeForFiguresCount(int figurescount)
+		{
+			FiguresCount_SortType figuresCount_SortType = (from x in GetAllFiguresCount_SortType()
+														   where x.FiguresCount == figurescount || (x.FiguresCountMin == null && x.FiguresCountMax >= figurescount) || (x.FiguresCountMax == null && x.FiguresCountMin <= figurescount) || (x.FiguresCountMin <= figurescount && x.FiguresCountMax >= figurescount)
+														   select x).FirstOrDefault();
+			return figuresCount_SortType;
+		}
 	}
 }

@@ -28,7 +28,21 @@ namespace Logic
 		}
 
 		public void DeleteCategory(string Id)
-		{			
+		{
+			var productCategories = from x in productCategRepo.Read()
+									where x.CategoryId == Id
+									select x;
+			foreach (var item in productCategories)
+			{
+				var products = from x in productRepo.Read()
+							   where x.ProductCategories.Any(p => p.Id == item.Id)
+							   select x;
+				foreach (var p in products)
+				{
+					p.ProductCategories.Remove(item);
+				}
+			}
+			SaveCategory();
 			this.categRepo.Delete(Id);
 		}
 
@@ -50,6 +64,53 @@ namespace Logic
 		public void SaveCategory()
 		{
 			categRepo.Save();
+		}
+
+		public IQueryable<Category> GetProductCategories(string productid)
+		{
+			var categories = from y in productCategRepo.Read()
+							 join categ in GetAllCategory() on y.CategoryId equals categ.Id
+							 where y.ProductId == productid
+							 select categ;
+
+			return categories;
+		}
+
+		public Category[] GetCategoryArray(List<string> categories)
+		{
+			List<Category> categs = new List<Category>();
+			foreach (var item in categories)
+			{
+				categs.Add(GetCategory(item));
+			}
+			Category[] categArray = new Category[categs.Count];
+			for (int i = 0; i < categs.Count; i++)
+			{
+				categArray[i] = categs[i];
+			}
+			return categArray;
+		}
+
+		public Category[] GetProductCategoryArray(string productid)
+		{
+			Category[] categArray = new Category[GetProductCategories(productid).Count()];
+			int count = 0;
+			foreach (var item in GetProductCategories(productid))
+			{
+				categArray[count] = item;
+				count++;
+			}
+			return categArray;
+		}
+
+		public List<Category> GetCategoriesFromIdList(List<string> ids)
+		{
+			List<Category> categories = new List<Category>();
+			for (int i = 0; i < ids.Count; i++)
+			{
+				categories.Add(GetCategory(ids[i]));
+			}
+			return categories;
 		}
 	}
 }

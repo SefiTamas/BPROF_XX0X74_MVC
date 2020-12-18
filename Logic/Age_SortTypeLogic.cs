@@ -43,5 +43,13 @@ namespace Logic
 		{
 			age_sortRepo.Update(Id, newitem);
 		}
+
+		public IQueryable<Age_SortType> OrderByAge(IQueryable<Age_SortType> ages)
+		{
+			IQueryable<Age_SortType> age_SortTypes = from x in ages
+													 orderby x.RecommendedAgeMin
+													 select x;
+			return age_SortTypes;
+		}
 	}
 }

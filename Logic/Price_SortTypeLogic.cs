@@ -39,5 +39,13 @@ namespace Logic
 		{
 			price_sortRepo.Update(Id, newitem);
 		}
+
+		public IQueryable<Price_SortType> OrderByPrice(IQueryable<Price_SortType> prices)
+		{
+			IQueryable<Price_SortType> price_SortTypes = from x in prices
+														 orderby x.PriceMin
+														 select x;
+			return price_SortTypes;
+		}
 	}
 }

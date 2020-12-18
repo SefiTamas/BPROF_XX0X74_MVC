@@ -40,5 +40,21 @@ namespace Logic
 		{
 			itemsc_sortRepo.Update(Id, newitem);
 		}
+
+		public IQueryable<ItemsCount_SortType> OrderByItems(IQueryable<ItemsCount_SortType> items)
+		{
+			IQueryable<ItemsCount_SortType> itemsc_SortTypes = from x in items
+															   orderby x.ItemsCountMin
+															   select x;
+			return itemsc_SortTypes;
+		}
+
+		public ItemsCount_SortType GetItemsCount_SortTypeForItemsCount(int itemscount)
+		{
+			ItemsCount_SortType itemsCount_SortType = (from x in GetAllItemsCount_SortType()
+													   where (x.ItemsCountMin == null && x.ItemsCountMax > itemscount) || (x.ItemsCountMax == null && x.ItemsCountMin <= itemscount) || (x.ItemsCountMin <= itemscount && x.ItemsCountMax > itemscount)
+													   select x).FirstOrDefault();
+			return itemsCount_SortType;
+		}
 	}
 }
